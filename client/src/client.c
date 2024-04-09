@@ -20,10 +20,11 @@ int main(void)
 	log_info(logger, "Hola! Soy un log");
 
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-
+	log_info(logger,"Creando Config...");
 	config = iniciar_config();
 	if (config == NULL)
 	{
+		log_error(logger,"Error al crear config");
 		exit(1);
 	}
 	// Usando el config creado previamente, leemos los valores del config y los
@@ -47,6 +48,7 @@ int main(void)
 
 	// Creamos una conexión hacia el servidor
 	// conexion = crear_conexion(ip, puerto);
+	log_info(logger,"Creando Conexion...");
 	conexion = crear_conexion(ip,puerto);
 
 	
@@ -68,7 +70,8 @@ t_log *iniciar_logger(void)
 
 t_config *iniciar_config(void)
 {
-	return config_create("./cliente.config");
+	
+	return config_create("~/tp0/client/cliente.config");
 }
 
 void leer_consola(t_log *logger)
