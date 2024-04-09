@@ -4,27 +4,28 @@ t_log* logger;
 
 int iniciar_servidor(void)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
 
 	int socket_servidor;
-
-	struct addrinfo hints, *servinfo, *p;
+	int err;
+	struct addrinfo hints, *server_info;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
-
+	getaddrinfo(NULL, PUERTO, &hints, &server_info);
 	// Creamos el socket de escucha del servidor
-
+	socket_servidor = socket(server_info->ai_family,
+                        server_info->ai_socktype,
+                        server_info->ai_protocol);
 	// Asociamos el socket a un puerto
+	err = bind(socket_servidor, server_info->ai_addr, server_info->ai_addrlen);
 
+	err = listen(socket_servidor, SOMAXCONN);
 	// Escuchamos las conexiones entrantes
 
-	freeaddrinfo(servinfo);
+	freeaddrinfo(server_info);
 	log_trace(logger, "Listo para escuchar a mi cliente");
 
 	return socket_servidor;
@@ -33,10 +34,8 @@ int iniciar_servidor(void)
 int esperar_cliente(int socket_servidor)
 {
 	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
-
 	// Aceptamos un nuevo cliente
-	int socket_cliente;
+	int socket_cliente = accept(socket_servidor, NULL, NULL);
 	log_info(logger, "Se conecto un cliente!");
 
 	return socket_cliente;
@@ -58,9 +57,9 @@ void* recibir_buffer(int* size, int socket_cliente)
 {
 	void * buffer;
 
-	recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-	buffer = malloc(*size);
-	recv(socket_cliente, buffer, *size, MSG_WAITALL);
+	recv(socket_cliente, size, sizeof(int), MSG_WAITALL); 	//Lee el size para tener la cantidad de bits a leer. El sizeof(int) es cuanto va a leer del mensaje.
+	buffer = malloc(*size);									//Aloca esa cantidad en memoria
+	recv(socket_cliente, buffer, *size, MSG_WAITALL);		//Lee el buffer restante.
 
 	return buffer;
 }
